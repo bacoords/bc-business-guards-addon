@@ -131,6 +131,42 @@ function cmb2_sample_metaboxes() {
 	) );
 
 	$cmb->add_field( array(
+		'name'       => __( 'City', 'cmb2' ),
+//		'desc'       => __( 'field description (optional)', 'cmb2' ),
+		'id'         => $prefix . 'city',
+		'type'       => 'text',
+		'show_on_cb' => 'cmb2_hide_if_no_cats', // function should return a bool value
+		// 'sanitization_cb' => 'my_custom_sanitization', // custom sanitization callback parameter
+		// 'escape_cb'       => 'my_custom_escaping',  // custom escaping callback parameter
+		// 'on_front'        => false, // Optionally designate a field to wp-admin only
+		// 'repeatable'      => true,
+	) );
+
+	$cmb->add_field( array(
+		'name'       => __( 'State', 'cmb2' ),
+//		'desc'       => __( 'field description (optional)', 'cmb2' ),
+		'id'         => $prefix . 'state',
+		'type'       => 'text',
+		'show_on_cb' => 'cmb2_hide_if_no_cats', // function should return a bool value
+		// 'sanitization_cb' => 'my_custom_sanitization', // custom sanitization callback parameter
+		// 'escape_cb'       => 'my_custom_escaping',  // custom escaping callback parameter
+		// 'on_front'        => false, // Optionally designate a field to wp-admin only
+		// 'repeatable'      => true,
+	) );
+
+	$cmb->add_field( array(
+		'name'       => __( 'Zip', 'cmb2' ),
+//		'desc'       => __( 'field description (optional)', 'cmb2' ),
+		'id'         => $prefix . 'zip',
+		'type'       => 'text',
+		'show_on_cb' => 'cmb2_hide_if_no_cats', // function should return a bool value
+		// 'sanitization_cb' => 'my_custom_sanitization', // custom sanitization callback parameter
+		// 'escape_cb'       => 'my_custom_escaping',  // custom escaping callback parameter
+		// 'on_front'        => false, // Optionally designate a field to wp-admin only
+		// 'repeatable'      => true,
+	) );
+
+	$cmb->add_field( array(
 		'name'       => __( 'Phone Number', 'cmb2' ),
 //		'desc'       => __( 'field description (optional)', 'cmb2' ),
 		'id'         => $prefix . 'phone',
@@ -215,6 +251,39 @@ function cmb2_sample_metaboxes() {
 }
 
 
+
+//
+//
+//add_filter( 'manage_edit-complaint_columns', 'my_edit_complaint_columns' ) ;
+//
+//function my_edit_complaint_columns( $columns ) {
+//
+//	$columns = array(
+//		'cb' => '<input type="checkbox" />',
+//		'title' => __( 'Movie' ),
+//		'duration' => __( 'Duration' ),
+//		'genre' => __( 'Genre' ),
+//		'date' => __( 'Date' )
+//	);
+//
+//	return $columns;
+//}
+
+
+
+
+
+
+
+
+
+// Custom Search Queries
+function add_query_vars_filter( $vars ){
+  $vars[] = "field";
+  return $vars;
+}
+add_filter( 'query_vars', 'add_query_vars_filter' );
+
 function bcbg_searchfilter($query) {
 
     if (!is_admin() && $query->is_main_query() && $query->is_search && rcp_is_active() ) {
@@ -223,16 +292,25 @@ function bcbg_searchfilter($query) {
 		
 		$query->set('sites__in', array(3));
 		
-        $query->set('post_type',array('complaint'));
+        $query->set('post_type', array('complaint'));
 	
     } 
 	
-//	if($query->is_search() && $_POST['meta_key']) {
-//		
-//        $query->query_vars['meta_key'] = $_POST['meta_key'];
-//        $query->query_vars['meta_value'] = $_POST['meta_value'];
-//        return;
-//    }
+	if($query->is_search() && $query->query_vars['field']) {
+		
+		$query->set('meta_query', array(
+					array(
+						'key' => $query->query_vars['field'],
+						'value' => sanitize_text_field($query->query_vars['s']),
+						'compare' => 'LIKE'
+					)
+				));		
+		
+		
+		
+		$query->set('s', null);
+
+    }
  
 	return $query;
 }
